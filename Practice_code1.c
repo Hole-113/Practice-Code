@@ -1,7 +1,5 @@
 // Generate report for Dataset and NamedRefrence count attach to ItemRevision
 
-
-
 #include"Header.h"
 
 int ITK_user_main(int argc, char* argv[])
@@ -12,12 +10,14 @@ int ITK_user_main(int argc, char* argv[])
 	tag_t tItemRevTag = NULLTAG;
 	tag_t* tSec_obj_list = NULLTAG;
 	tag_t* tNamedRefList = NULLTAG;
-
+	tag_t tClassId = NULLTAG;
+	char* cClassName = NULL;
 	char* cDatasetType = NULL;
 	char* cUserID = ITK_ask_cli_argument("-u=");
 	char* cPassword = ITK_ask_cli_argument("-p=");
 	char* cGroup = ITK_ask_cli_argument("-g=");
 	char* cItemID = ITK_ask_cli_argument("-item_id=");
+	
     //#define MAX_LINE_LENGTH 1024
 	printf("123");
 	FILE *fptr;
@@ -37,25 +37,29 @@ int ITK_user_main(int argc, char* argv[])
 
 		for (int i = 0; i < iSec_obj_count; i++)
 		{
-			Report_Error(WSOM_ask_object_type2(tSec_obj_list[i], &cDatasetType));
-			printf("\n%s\n", cDatasetType);
-			char arr[2][10] = { "PDF", "Text" };
-			for (int j = 0; j < 2; j++)
+
+			Report_Error(POM_class_of_instance(tSec_obj_list[i], &tClassId));
+			printf("\n%d\n", tClassId);
+
+			Report_Error(POM_name_of_class(tClassId, &cClassName));
+			printf("\n%s\n", cClassName);
+
+			if (tc_strcmp(cClassName, "Dataset") == 0)
 			{
 
-				if (tc_strcmp(cDatasetType, arr[j]) == 0)
-				{
-					Report_Error(AE_ask_dataset_named_refs(tSec_obj_list[i], &iNamedRefCount, &tNamedRefList));
+				Report_Error(WSOM_ask_object_type2(tSec_obj_list[i], &cDatasetType));
+				printf("\n%s\n", cDatasetType);
+
+				Report_Error(AE_ask_dataset_named_refs(tSec_obj_list[i], &iNamedRefCount, &tNamedRefList));
 
 					if (iNamedRefCount > 0)
 					{
-						TC_fprintf(fptr, "%s,%s,%d\n", cItemID,cDatasetType ,iNamedRefCount);
+						TC_fprintf(fptr, "%s,%s,%d\n", cItemID, cDatasetType, iNamedRefCount);
 					}
 					else
 					{
-						TC_fprintf(fptr, "%s,%s,%d\n", cItemID,cDatasetType ,iNamedRefCount);
+						TC_fprintf(fptr, "%s,%s,%d\n", cItemID, cDatasetType, iNamedRefCount);
 					}
-				}
 
 			}
 

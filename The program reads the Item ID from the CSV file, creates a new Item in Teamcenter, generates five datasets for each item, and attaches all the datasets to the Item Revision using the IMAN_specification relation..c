@@ -1,30 +1,28 @@
-
 // The program reads the Item ID from the CSV file, creates a new Item in Teamcenter, generates five datasets for each item, and attaches all the datasets to the Item Revision using the IMAN_specification relation.
 
-
+#define _CRT_SECURE_NO_WARNINGS
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
 #include<tc/tc_startup.h>
 #include<tcinit/tcinit.h>
 #include<tc/emh.h>
-#include<tc/item.h>
-#include<ctcore/workspaceobject.h>
-#include<ctcore/grm.h>
+#include<tccore/item.h>
+#include<tccore/workspaceobject.h>
+#include<tccore/grm.h>
 #include<AE/ae.h>
 #include<AE/dataset.h>
 #include<TC/folder.h>
 #include<SA/user.h>
-#include<ctcore/aom.h>
-#include<tcclasses/tc_string.h>
-#include<ctcore/project.h>
-#include<ctcore/workspaceobject.h>
-#include<ctcore/aom_prop.h>
-#include<ctcore/tctype.h>
+#include<tccore/aom.h>
+#include<tccore/project.h>
+#include<tccore/workspaceobject.h>
+#include<tccore/aom_prop.h>
+#include<tccore/tctype.h>
 #include<stdio.h>
 #include<stdlib.h>
-#include<tcclasses/tc_string.h>
-#include<ctcore/tctype.h>
+#include<fclasses/tc_string.h>
+#include<tccore/tctype.h>
 
 #define MAX_LINE_LENGTH 1024
 #define MAX_FIELD_LENGTH 256
@@ -54,7 +52,6 @@ int Report_Error(int iFail)
 
 
 
-
 #include "Header.h"
 
 int ITK_user_main(int argc, char* argv[])
@@ -71,9 +68,9 @@ int ITK_user_main(int argc, char* argv[])
     char* cClassName = NULL;
     char* cDatasetType = NULL;
 
-    char* cUserID   = ITK_ask_cli_argument("-u=");
+    char* cUserID = ITK_ask_cli_argument("-u=");
     char* cPassword = ITK_ask_cli_argument("-p=");
-    char* cGroup    = ITK_ask_cli_argument("-g=");
+    char* cGroup = ITK_ask_cli_argument("-g=");
     char* cInputFile = ITK_ask_cli_argument("-input_file=");
 
     input_t record;
@@ -84,7 +81,7 @@ int ITK_user_main(int argc, char* argv[])
 
     char* relation_name = "IMAN_specification";
     tag_t tItem = NULLTAG;
-    tag_t tRev  = NULLTAG;
+    tag_t tRev = NULLTAG;
     tag_t t_relation_type = NULLTAG;
     tag_t datatype = NULLTAG;
     tag_t new_dataset = NULLTAG;
@@ -95,7 +92,7 @@ int ITK_user_main(int argc, char* argv[])
         "UGMASTER",
         "UGPART",
         "PDF",
-        "MSEXECEL",
+        "MSExcelX",
         "MSWORD"
     };
 
@@ -128,10 +125,10 @@ int ITK_user_main(int argc, char* argv[])
             if (irow_count == 1)
                 continue;
 
-            char* cItem_ID   = strtok_s(buf, delim, &Token);
+            char* cItem_ID = strtok_s(buf, delim, &Token);
             char* cItem_Name = strtok_s(NULL, delim, &Token);
             char* cItem_Type = strtok_s(NULL, delim, &Token);
-            char* cItem_Rev  = strtok_s(NULL, delim, &Token);
+            char* cItem_Rev = strtok_s(NULL, delim, &Token);
 
             record.cItem_ID = cItem_ID;
             record.cItem_Name = cItem_Name;
@@ -139,10 +136,10 @@ int ITK_user_main(int argc, char* argv[])
             record.cItem_Rev = cItem_Rev;
 
             Report_Error(iFail = ITEM_create_item(record.cItem_ID,
-                                                  record.cItem_Name,
-                                                  record.cItem_Type,
-                                                  record.cItem_Rev,
-                                                  &tItem, &tRev));
+                record.cItem_Name,
+                record.cItem_Type,
+                record.cItem_Rev,
+                &tItem, &tRev));
 
             // Save item
             Report_Error(iFail = ITEM_save_item(tItem));
@@ -162,18 +159,18 @@ int ITK_user_main(int argc, char* argv[])
 
                 // Create dataset
                 Report_Error(iFail = AE_create_dataset_with_id(datatype,
-                                                               record.cItem_ID,
-                                                               dataset_descriptions[i],
-                                                               "",
-                                                               "",
-                                                               &new_dataset));
+                    record.cItem_ID,
+                    dataset_descriptions[i],
+                    "",
+                    "",
+                    &new_dataset));
 
                 // Save dataset
                 Report_Error(iFail = AE_save_myself(new_dataset));
 
                 // Create relation between revision & dataset
                 Report_Error(iFail = GRM_create_relation(tRev, new_dataset, t_relation_type,
-                                                         NULLTAG, &relation));
+                    NULLTAG, &relation));
 
                 // Save relation
                 Report_Error(iFail = GRM_save_relation(relation));

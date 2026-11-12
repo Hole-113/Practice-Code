@@ -4,11 +4,11 @@ Sr. No.	ITK API	Purpose
 2	EPM_register_action_handler()	Registers a workflow action handler.
 3	EPM_ask_root_task()	Gets the root task of the workflow.
 4	EPM_ask_attachments()	Gets attachments from the workflow task.
-5	EPM_get_participanttype()	Gets a participant type using its name.
+5	EPM_get_participanttype()	Retrieves the participant type based on the type name.
 
 2. Participant APIs
 Sr. No.	ITK API	Purpose
-6	PARTICIPANT_ask_participants()	Retrieves participants assigned to an object for a particular participant type.
+6	PARTICIPANT_ask_participants()	Retrieves participants assigned to an object for a particular participant type. OR Asks participants of a Workspace object.
 7	PARTICIPANT_set_participants()	Assigns participants to an object.
 
 Important: Your code retrieves 31 participant types and merges their participant lists before assigning them to child ItemRevisions.
